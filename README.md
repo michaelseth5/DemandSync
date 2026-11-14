@@ -18,6 +18,9 @@ Home page For Inventory Analysis
 Procurement Page
 
 <img width="566" height="545" alt="image (2)" src="https://github.com/user-attachments/assets/59e38a62-345a-4699-b891-5a90b2443364" />
+<img width="987" height="1119" alt="ChatGPT Image Nov 14, 2026, 12_53_48 PM" src="https://github.com/user-attachments/assets/5db82b8b-13e1-4eca-ae45-0436063b2c16" />
+<img width="603" height="588" alt="DemandSync - Presentation" src="https://github.com/user-attachments/assets/0d87ff38-b7d4-4a7f-a559-da28d77ddcc1" />
+<img width="358" height="334" alt="DemandSync - Presentation (1)" src="https://github.com/user-attachments/assets/39b431f1-5aea-4065-ad05-4b62e6ae5123" />
 
 Video Walkthrough
 
