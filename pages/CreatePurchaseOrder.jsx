@@ -1,3 +1,4 @@
+import "../styles/ds-ui.css";
 import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import ChatBot from "../components/ChatBot.jsx";
@@ -56,8 +57,9 @@ export default function CreatePurchaseOrder() {
       items.sort((a, b) => a.vendor.localeCompare(b.vendor));
     }
 
+    if (groupBy !== "risk") items.sort((a,b) => String(groupBy === "supplier" ? a.vendor : a.category).localeCompare(String(groupBy === "supplier" ? b.vendor : b.category)));
     return items;
-  }, [categoryFilter, supplierFilter, searchQuery, keyItemsOnly, sortBy]);
+  }, [categoryFilter, supplierFilter, searchQuery, keyItemsOnly, sortBy, groupBy]);
 
   const summary = useMemo(() => {
     const selected = filteredItems.filter(item => selectedItems.has(item.id));
@@ -70,6 +72,16 @@ export default function CreatePurchaseOrder() {
     };
   }, [filteredItems, selectedItems]);
 
+  const exportCsv = () => {
+    const columns = ["name","category","supplier","onHand","parLevel","forecastUsage","recommendedQty","unitCost","extendedCost"];
+    const rows = filteredItems.filter(item => selectedItems.size === 0 || selectedItems.has(item.id));
+    const quote = value => '"' + String(value ?? "").replace(/"/g,'""') + '"';
+    const csv = [columns.join(","), ...rows.map(row => columns.map(key => quote(row[key])).join(","))].join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
+    const link = document.createElement("a");
+    link.href=url; link.download="demandsync-purchase-suggestions.csv"; link.click();
+    URL.revokeObjectURL(url);
+  };
   const toggleItem = (id) => {
     const newSet = new Set(selectedItems);
     if (newSet.has(id)) {
@@ -81,38 +93,8 @@ export default function CreatePurchaseOrder() {
   };
 
   return (
-    <>
-      <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background: radial-gradient(circle at top, #e6f4ff 0, #b9e6ff 35%, #8ad0ff 100%); padding: 24px; color: #0f172a; }
-        .page-container { max-width: 1400px; margin: 0 auto; }
-        .header-card { background: linear-gradient(135deg, #0ea5e9, #38bdf8); color: white; padding: 24px; border-radius: 24px; margin-bottom: 24px; }
-        .page-title { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
-        .page-subtitle { font-size: 14px; opacity: 0.9; }
-        .filter-bar { background: #f9fbff; padding: 16px; border-radius: 16px; margin-bottom: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-        .filter-item select, .filter-item input { width: 100%; padding: 8px 12px; border: 1px solid #dbeafe; border-radius: 8px; font-size: 14px; }
-        .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-        .summary-card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .summary-label { font-size: 12px; color: #6b7280; text-transform: uppercase; margin-bottom: 8px; }
-        .summary-value { font-size: 24px; font-weight: 600; color: #0ea5e9; }
-        .main-content { display: grid; grid-template-columns: 1fr 300px; gap: 24px; }
-        .table-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .table-controls { display: flex; gap: 12px; }
-        .table-controls select, .table-controls button { padding: 6px 12px; border: 1px solid #dbeafe; border-radius: 8px; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; background: #eff6ff; color: #6b7280; font-size: 12px; font-weight: 600; }
-        td { padding: 12px; border-top: 1px solid #e5e7eb; font-size: 13px; }
-        tr:hover { background: #f9fafb; }
-        .risk-high { color: #b91c1c; font-weight: 600; }
-        .risk-medium { color: #f59e0b; font-weight: 600; }
-        .risk-low { color: #22c55e; }
-        .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
-        .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; }
-        .btn-primary { background: #0ea5e9; color: white; }
-        .btn-secondary { background: white; color: #0ea5e9; border: 1px solid #0ea5e9; }
-        .checkbox { width: 18px; height: 18px; cursor: pointer; }
-      `}</style>
+    <div className="ds-ui ds-purchase">
+      
       
       <div className="page-container">
         <div className="header-card">
@@ -177,7 +159,7 @@ export default function CreatePurchaseOrder() {
             <div className="summary-value">${summary.totalSpend.toFixed(2)}</div>
           </div>
           <div className="summary-card">
-            <div className="summary-label">Total Items</div>
+            <div className="summary-label">Suggested Items</div>
             <div className="summary-value">{summary.totalItems}</div>
           </div>
           <div className="summary-card">
@@ -195,28 +177,27 @@ export default function CreatePurchaseOrder() {
             <div className="table-header">
               <h2 style={{ fontSize: 18, fontWeight: 600 }}>Suggested Items ({filteredItems.length})</h2>
               <div className="table-controls">
-                <select value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
+                <select aria-label="Group by" value={groupBy} onChange={(e) => setGroupBy(e.target.value)}>
                   <option value="category">Group by Category</option>
                   <option value="supplier">Group by Supplier</option>
                   <option value="risk">Group by Risk</option>
                 </select>
-                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <select aria-label="Sort by" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                   <option value="risk">Sort by Risk</option>
                   <option value="category">Sort by Category</option>
                   <option value="supplier">Sort by Supplier</option>
                 </select>
               </div>
             </div>
-            <div style={{ maxHeight: "600px", overflowY: "auto" }}>
+            <div className="ds-table-scroll">
               <table>
-                <thead style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 10 }}>
+                <thead>
                   <tr>
-                    <th><input type="checkbox" onChange={(e) => {
+                    <th><input type="checkbox" aria-label="Select all visible items" checked={filteredItems.length > 0 && filteredItems.every(item => selectedItems.has(item.id))} onChange={(e) => {
                       if (e.target.checked) {
-                        filteredItems.forEach(item => selectedItems.add(item.id));
-                        setSelectedItems(new Set(selectedItems));
+                        setSelectedItems(prev => new Set([...prev, ...filteredItems.map(item => item.id)]));
                       } else {
-                        setSelectedItems(new Set());
+                        setSelectedItems(prev => { const next = new Set(prev); filteredItems.forEach(item => next.delete(item.id)); return next; });
                       }
                     }} /></th>
                     <th>Item Name</th>
@@ -232,9 +213,10 @@ export default function CreatePurchaseOrder() {
                   </tr>
                 </thead>
                 <tbody>
+                  {filteredItems.length === 0 && <tr><td colSpan={11} className="ds-empty">No items match your filters.</td></tr>}
                   {filteredItems.map(item => (
-                    <tr key={item.id} style={{ backgroundColor: item.recommendedQty > 0 && item.risk === "high" ? "#fee2e2" : "transparent" }}>
-                      <td><input type="checkbox" className="checkbox" checked={selectedItems.has(item.id)} onChange={() => toggleItem(item.id)} /></td>
+                    <tr key={item.id} className={item.recommendedQty > 0 && item.risk === "high" ? "ds-row-risk" : ""}>
+                      <td><input type="checkbox" className="checkbox" aria-label={`Select ${item.name}`} checked={selectedItems.has(item.id)} onChange={() => toggleItem(item.id)} /></td>
                       <td>{item.name}</td>
                       <td>{item.category}</td>
                       <td>{item.supplier}</td>
@@ -253,7 +235,7 @@ export default function CreatePurchaseOrder() {
             <div className="action-buttons">
               <button className="btn btn-primary">Rebuild Suggestions</button>
               <button className="btn btn-secondary">Reset to Par Only</button>
-              <button className="btn btn-secondary">Export to CSV</button>
+              <button className="btn btn-secondary" onClick={exportCsv}>Export to CSV</button>
               <button className="btn btn-primary">Create Purchase Order</button>
               <button className="btn btn-secondary">Save as Draft</button>
             </div>
@@ -261,7 +243,7 @@ export default function CreatePurchaseOrder() {
         </div>
       </div>
       <ChatBot />
-    </>
+    </div>
   );
 }
 
