@@ -1,3 +1,4 @@
+import "../styles/ds-ui.css";
 import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import ChatBot from "../components/ChatBot.jsx";
@@ -61,35 +62,8 @@ export default function ViewInventory() {
   }, [inventoryItems]);
 
   return (
-    <>
-      <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background: radial-gradient(circle at top, #e6f4ff 0, #b9e6ff 35%, #8ad0ff 100%); padding: 24px; color: #0f172a; }
-        .page-container { max-width: 1400px; margin: 0 auto; }
-        .header-card { background: linear-gradient(135deg, #0ea5e9, #38bdf8); color: white; padding: 24px; border-radius: 24px; margin-bottom: 24px; }
-        .page-title { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
-        .page-subtitle { font-size: 14px; opacity: 0.9; }
-        .filter-bar { background: #f9fbff; padding: 16px; border-radius: 16px; margin-bottom: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-        .filter-item select, .filter-item input { width: 100%; padding: 8px 12px; border: 1px solid #dbeafe; border-radius: 8px; font-size: 14px; }
-        .summary-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-        .summary-card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .summary-label { font-size: 12px; color: #6b7280; text-transform: uppercase; margin-bottom: 8px; }
-        .summary-value { font-size: 24px; font-weight: 600; color: #0ea5e9; }
-        .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-        .tab { padding: 10px 20px; border-radius: 8px; background: white; border: 1px solid #dbeafe; cursor: pointer; font-size: 14px; }
-        .tab.active { background: #0ea5e9; color: white; border-color: #0ea5e9; }
-        .table-card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; background: #eff6ff; color: #6b7280; font-size: 12px; font-weight: 600; }
-        td { padding: 12px; border-top: 1px solid #e5e7eb; font-size: 13px; }
-        tr:hover { background: #f9fafb; }
-        .status-below { color: #b91c1c; font-weight: 600; }
-        .status-over { color: #f59e0b; font-weight: 600; }
-        .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
-        .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; }
-        .btn-primary { background: #0ea5e9; color: white; }
-        .btn-secondary { background: white; color: #0ea5e9; border: 1px solid #0ea5e9; }
-      `}</style>
+    <div className="ds-ui ds-inventory">
+      
       
       <div className="page-container">
         <div className="header-card">
@@ -157,9 +131,9 @@ export default function ViewInventory() {
             <button className={`tab ${activeTab === "storage" ? "active" : ""}`} onClick={() => setActiveTab("storage")}>By Storage Area</button>
             <button className={`tab ${activeTab === "slow" ? "active" : ""}`} onClick={() => setActiveTab("slow")}>Slow Movers</button>
           </div>
-          <div style={{ maxHeight: "600px", overflowY: "auto" }}>
+          <div className="ds-table-scroll">
             <table>
-              <thead style={{ position: "sticky", top: 0, background: "#eff6ff", zIndex: 10 }}>
+              <thead>
                 <tr>
                   <th>Item</th>
                   <th>Category</th>
@@ -173,8 +147,9 @@ export default function ViewInventory() {
                 </tr>
               </thead>
               <tbody>
+                {inventoryItems.length === 0 && <tr><td colSpan={9} className="ds-empty">No inventory items match your filters.</td></tr>}
                 {inventoryItems.map(item => (
-                  <tr key={item.id} style={{ backgroundColor: item.status === "below" ? "#fee2e2" : item.status === "over" ? "#fef3c7" : "transparent" }}>
+                  <tr key={item.id} className={item.status === "below" ? "ds-row-risk" : item.status === "over" ? "ds-row-over" : ""}>
                     <td>{item.name}</td>
                     <td>{item.category}</td>
                     <td>{item.storageArea}</td>
@@ -200,7 +175,7 @@ export default function ViewInventory() {
         </div>
       </div>
       <ChatBot />
-    </>
+    </div>
   );
 }
 

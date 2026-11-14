@@ -1,3 +1,4 @@
+import "../styles/ds-ui.css";
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import ChatBot from "../components/ChatBot.jsx";
@@ -150,383 +151,8 @@ const ingredientUsage = [
 
 export default function UnifiedDashboard() {
   return (
-    <>
-      <style>{`
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        body {
-          min-height: 100vh;
-          background: radial-gradient(circle at top, #e6f4ff 0, #b9e6ff 35%, #8ad0ff 100%);
-          display: flex;
-          justify-content: center;
-          align-items: flex-start;
-          padding: 32px 16px;
-          color: #0f172a;
-        }
-
-        .app-shell {
-          width: 100%;
-          max-width: 1200px;
-          display: grid;
-          grid-template-columns: minmax(0, 3fr);
-          gap: 24px;
-        }
-
-        .top-row {
-          display: grid;
-          grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.2fr);
-          gap: 24px;
-        }
-
-        .card {
-          background: #f9fbff;
-          border-radius: 24px;
-          box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
-          padding: 20px 22px;
-        }
-
-        .header-card {
-          background: linear-gradient(135deg, #0ea5e9, #38bdf8);
-          color: white;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-
-        .header-top {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 16px;
-        }
-
-        .logo-circle {
-          width: 40px;
-          height: 40px;
-          border-radius: 16px;
-          background: rgba(15, 23, 42, 0.25);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 600;
-          font-size: 12px;
-          letter-spacing: 0.09em;
-          text-transform: uppercase;
-        }
-
-        .app-title {
-          font-size: 22px;
-          font-weight: 600;
-        }
-
-        .subtitle {
-          margin-top: 4px;
-          font-size: 12px;
-          opacity: 0.92;
-        }
-
-        .selectors {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .pill-input {
-          border-radius: 999px;
-          padding: 6px 14px;
-          border: none;
-          font-size: 12px;
-          background: rgba(15, 23, 42, 0.16);
-          color: white;
-          outline: none;
-        }
-
-        .pill-input option {
-          background: #0ea5e9;
-          color: white;
-        }
-
-        .nav-tabs {
-          margin-top: 16px;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .tab-pill {
-          padding: 6px 14px;
-          border-radius: 999px;
-          font-size: 12px;
-          background: rgba(15, 23, 42, 0.12);
-          border: 1px solid transparent;
-          cursor: pointer;
-          color: white;
-          border: none;
-        }
-
-        .tab-pill.active {
-          background: white;
-          color: #0ea5e9;
-          border-color: rgba(15, 23, 42, 0.06);
-        }
-
-        .tab-pill:hover {
-          background: rgba(15, 23, 42, 0.16);
-        }
-
-        .tab-pill.active:hover {
-          background: rgba(255, 255, 255, 0.95);
-        }
-
-        .section-title {
-          font-size: 14px;
-          font-weight: 600;
-          margin-bottom: 10px;
-        }
-
-        .section-subtitle {
-          font-size: 11px;
-          color: #6b7280;
-          margin-bottom: 14px;
-        }
-
-        .alerts-list {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-
-        .alert-card {
-          border-radius: 18px;
-          padding: 10px 12px;
-          display: flex;
-          justify-content: space-between;
-          gap: 10px;
-          font-size: 12px;
-          align-items: center;
-        }
-
-        .alert-main {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-
-        .alert-title {
-          font-weight: 600;
-        }
-
-        .alert-detail {
-          font-size: 11px;
-          color: #4b5563;
-        }
-
-        .alert-badge {
-          font-size: 10px;
-          border-radius: 999px;
-          padding: 4px 10px;
-          font-weight: 600;
-          white-space: nowrap;
-        }
-
-        .alert-high {
-          background: #fee2e2;
-          color: #b91c1c;
-        }
-        .alert-high-main {
-          background: linear-gradient(135deg, #fee2e2, #fecaca);
-        }
-
-        .alert-medium {
-          background: #fef3c7;
-          color: #92400e;
-        }
-        .alert-medium-main {
-          background: linear-gradient(135deg, #fef3c7, #fde68a);
-        }
-
-        .alert-low {
-          background: #e0f2fe;
-          color: #1d4ed8;
-        }
-        .alert-low-main {
-          background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
-        }
-
-        .actions-grid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 10px;
-        }
-
-        .action-btn {
-          border-radius: 18px;
-          border: 1px solid #dbeafe;
-          background: white;
-          padding: 10px 12px;
-          font-size: 11px;
-          font-weight: 500;
-          color: #0f172a;
-          text-align: left;
-          cursor: pointer;
-          box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
-          transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
-          text-decoration: none;
-          display: block;
-        }
-
-        .action-btn span {
-          display: block;
-          font-size: 10px;
-          color: #6b7280;
-          margin-top: 4px;
-        }
-
-        .action-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
-          background: #eff6ff;
-        }
-
-        .tab-pill {
-          text-decoration: none;
-        }
-
-        .kpi-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 12px;
-        }
-
-        .kpi-card {
-          border-radius: 20px;
-          padding: 10px 12px;
-          background: linear-gradient(135deg, #f8fafc, #e0f2fe);
-          box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
-        }
-
-        .kpi-label {
-          font-size: 10px;
-          font-weight: 500;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: #6b7280;
-        }
-
-        .kpi-value {
-          margin-top: 6px;
-          font-size: 16px;
-          font-weight: 600;
-        }
-
-        .kpi-helper {
-          margin-top: 3px;
-          font-size: 10px;
-          color: #64748b;
-        }
-
-        .bottom-grid {
-          display: grid;
-          grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
-          gap: 24px;
-        }
-
-        .mini-chart {
-          height: 160px;
-          display: flex;
-          align-items: flex-end;
-          gap: 10px;
-        }
-
-        .bar-column {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .bar-shell {
-          width: 100%;
-          height: 120px;
-          border-radius: 16px;
-          background: #e5ecff;
-          display: flex;
-          align-items: flex-end;
-          padding: 4px;
-        }
-
-        .bar-fill {
-          width: 100%;
-          border-radius: 14px;
-          background: linear-gradient(180deg, #2563eb, #0ea5e9);
-        }
-
-        .bar-label {
-          font-size: 10px;
-          color: #64748b;
-          text-align: center;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 11px;
-        }
-
-        thead {
-          background: #eff6ff;
-        }
-
-        th, td {
-          padding: 8px 6px;
-          text-align: left;
-        }
-
-        th {
-          color: #6b7280;
-          font-weight: 500;
-        }
-
-        tbody tr:nth-child(even) {
-          background: #f9fafb;
-        }
-
-        .badge-urgency {
-          padding: 3px 8px;
-          border-radius: 999px;
-          font-size: 10px;
-          font-weight: 600;
-          color: #b91c1c;
-          background: #fee2e2;
-        }
-
-        @media (max-width: 900px) {
-          .top-row, .bottom-grid {
-            grid-template-columns: minmax(0, 1fr);
-          }
-          .kpi-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-        }
-
-        @media (max-width: 640px) {
-          body {
-            padding: 20px 10px;
-          }
-          .kpi-grid {
-            grid-template-columns: minmax(0, 1fr);
-          }
-          .actions-grid {
-            grid-template-columns: minmax(0, 1fr);
-          }
-        }
-      `}</style>
+    <div className="ds-ui ds-dashboard">
+      
       
       <main className="app-shell">
         <div className="top-row">
@@ -534,7 +160,7 @@ export default function UnifiedDashboard() {
           <section className="card header-card">
             <div className="header-top">
               <div>
-                <div className="logo-circle">DFG</div>
+                <div className="logo-circle">DS</div>
               </div>
               <div className="selectors">
                 <select className="pill-input">
@@ -551,7 +177,7 @@ export default function UnifiedDashboard() {
             </div>
 
             <div style={{ marginTop: 18 }}>
-              <p className="app-title">Del Frisco's Grille - Unified Dashboard</p>
+              <p className="app-title">DemandSync · Operations Overview</p>
               <p className="subtitle">
                 Restaurant operations, inventory, and cost in one place.
               </p>
@@ -621,7 +247,7 @@ export default function UnifiedDashboard() {
           <section className="card">
             <p className="section-title">Ingredient usage - last 7 days</p>
             <p className="section-subtitle">
-              Visual placeholder - hook up to real chart later.
+              Seven-day usage comparison for selected ingredients.
             </p>
             <div className="mini-chart">
               {ingredientUsage.map((ing, idx) => (
@@ -640,7 +266,7 @@ export default function UnifiedDashboard() {
             <p className="section-subtitle">
               Based on par levels and short term forecast.
             </p>
-            <div style={{ overflow: "hidden", borderRadius: 18, border: "1px solid #e5e7eb" }}>
+            <div className="ds-table-scroll">
               <table>
                 <thead>
                   <tr>
@@ -672,6 +298,6 @@ export default function UnifiedDashboard() {
         </section>
       </main>
       <ChatBot />
-    </>
+    </div>
   );
 }
