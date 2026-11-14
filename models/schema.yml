@@ -1,0 +1,23 @@
+version: 2
+sources:
+  - name: raw
+    schema: public
+    tables:
+      - name: sales_transactions
+models:
+  - name: stg_sales_transactions
+    columns:
+      - name: external_id
+        tests: [unique, not_null]
+      - name: sku
+        tests: [not_null]
+      - name: sold_on
+        tests: [not_null]
+      - name: quantity
+        tests: [not_null]
+  - name: daily_sku_demand
+    columns:
+      - name: sku
+        tests: [not_null]
+      - name: sold_on
+        tests: [not_null]
