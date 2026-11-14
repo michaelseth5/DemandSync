@@ -190,3 +190,56 @@ Contact
 Michael Katongole
 
 
+
+
+## Transaction-to-inventory analytics module (new feature branch)
+
+The existing application is **FastAPI + SQLAlchemy**, not Flask. An optional PostgreSQL connection is supported with `DATABASE_URL=postgresql+psycopg://USER:PASSWORD@localhost:5432/demandsync`; without that variable the existing local SQLite default is used. The independent transaction pipeline works with both; dbt SQL transformations target PostgreSQL.
+
+### Run
+
+```bash
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --reload --port 8000
+# separate terminal
+npm install && npm run dev
+# then visit /demand-workbench
+```
+
+Generate and ingest 150,000 **synthetic, reproducible** transactions (not business production records):
+
+```bash
+python scripts/generate_transactions.py --rows 150000
+python -m scripts.import_transactions data/synthetic_transactions.csv
+python -m pytest -q tests/test_transaction_pipeline.py
+```
+
+Use `/docs` to try the documented API under `/api/v1/analytics`:
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| POST | /transactions/ingest | Idempotent batch ingestion with row-level rejection logs |
+| GET | /transactions | Paginated transaction inspection |
+| GET | /quality | Accepted and rejected row totals |
+| GET | /daily-demand/{sku} | Daily SKU aggregation |
+| POST | /models/train/{sku} | Time-ordered XGBoost training, evaluation, persisted local model |
+| GET | /models/{sku}/forecast | Recursive next 1–30-day forecast |
+| GET | /models/runs/{sku} | Model training history |
+| POST | /models/drift | Compare current MAE with baseline for drift alerting |
+| POST | /inventory/recommend | Lead-time demand + safety-stock order calculation |
+
+### dbt (PostgreSQL)
+
+```bash
+pip install dbt-postgres
+# copy profiles.example.yml to ~/.dbt/profiles.yml and set DBT_PASSWORD
+# configure DBT_HOST, DBT_USER, DBT_DATABASE as needed
+dbt run
+dbt test
+```
+
+### Model limitations
+
+The model uses trailing observed demand for training and recursive generated demand for future dates. The holdout is chronological (not shuffled). MAPE excludes zero-demand actuals; MAE is also reported. Zero-filled missing dates are an assumption and should be replaced with validated daily source completeness for real POS integrations. The drift endpoint only evaluates provided actual/predicted arrays; it does not autonomously schedule retraining. Local model artifacts live in `artifacts/` and must be shared with workers or moved to durable model storage in distributed deployments.
+
+**Metrics note:** The synthetic generator demonstrates ability to process a large batch, not verified historical processing volumes. No particular MAPE, inventory reduction, latency improvement, or uptime is guaranteed. The API lacks authentication and should not be deployed publicly without access control, upload quotas, and rate limiting.

@@ -29,6 +29,7 @@ import BarOrderGuide from "./pages/BarOrderGuide.jsx";
 import ItemUsageTrends from "./pages/ItemUsageTrends.jsx";
 import WeeklyForecastSummary from "./pages/WeeklyForecastSummary.jsx";
 import ImportData from "./pages/ImportData.jsx";
+import DemandWorkbench from "./pages/DemandWorkbench.jsx";
 import Overview from "./pages/dashboard/Overview.jsx";
 import Chef from "./pages/dashboard/Chef.jsx";
 import BarManager from "./pages/dashboard/BarManager.jsx";
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
   { path: "/item-usage-trends", element: <ItemUsageTrends /> },
   { path: "/weekly-forecast-summary", element: <WeeklyForecastSummary /> },
   { path: "/import-data", element: <ImportData /> },
+  { path: "/demand-workbench", element: <DemandWorkbench /> },
   { path: "/overview", element: <ExecutiveDashboard /> },
   { path: "/legacy", element: <App /> },
   { path: "/orders/:id", element: <OrderDetail /> },

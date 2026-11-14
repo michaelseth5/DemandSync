@@ -6,6 +6,7 @@ export default function Navigation() {
   const navItems = [
     { path: "/", label: "Dashboard" },
     { path: "/catalog", label: "Catalog" },
+    { path: "/demand-workbench", label: "Forecasting" },
   ];
   
   return (
